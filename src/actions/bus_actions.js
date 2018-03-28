@@ -1,5 +1,4 @@
 import request from 'superagent';
-import Throttle from 'superagent-throttle';
 import _ from 'lodash';
 
 import {
@@ -11,7 +10,7 @@ import {
 
 
 //Again, the API keys should be excluded
-const BUS_ROOT_URL = 'http://api.translink.ca/rttiapi/v1/buses';
+const BUS_ROOT_URL = 'https://api.translink.ca/rttiapi/v1/buses';
 const APIKEY = 'M7cSDcbs72iJ5mFWFtdX';
 
 //url helper, separated to allow other types of requests
@@ -32,18 +31,10 @@ const filteredResults = (data) => {
 //fetch buses
 export const fetchBuses = () => async (dispatch) => {
   try {
-    //set throttle to prevent excessive api calls
-    let throttle = new Throttle({
-      active: true,
-      rate: 2,
-      ratePer: 2000,
-      concurrent: 2,
-    });
 
     //request data
     let response = await request.get(API_URL)
-                                .set({ accept: 'application/json' })
-                                .use(throttle.plugin());
+                                .set({ accept: 'application/json' });
 
     //console.log(response);
     //clean up data

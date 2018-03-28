@@ -20,7 +20,7 @@ export default function(state = INITIAL_STATE, action) {
       return { fetchResults: action.payload };
 
     case FETCH_BUS_ERROR:
-      return { ...state, error: action.payload };
+      return { error: action.payload };
 
     default:
       return state;
