@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
-import ReactMapGL from 'react-map-gl';
+import { connect } from 'react-redux';
+import ReactMapGL, { Popup } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import _ from 'lodash';
+
+import Bus from './Bus';
+import * as actions from '../actions';
 
 //should use dotenv to separateout the token but for the purpose of this app,
 //but for the purposes of this app, we'll just use a const
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiYXBvbGxvbXVzZXMiLCJhIjoiY2pmOWg2c3VjMjFwaDJ3cGRrcDZyMDVsdyJ9.6ztyqo-fnkW1DNabN1HQWQ';
+const API_REQUEST_INTERVAL = 2500;
+
 
 class Map extends Component {
   state = {
@@ -14,38 +21,130 @@ class Map extends Component {
       latitude: 49.252,
       longitude: -123.106,
       zoom: 12.3,
+    },
+  };
+
+  componentWillMount() {
+    //fetching for the first time
+    this.props.fetchBuses();
+  }
+
+  componentDidMount() {
+    //fetching new bus locations on a interval
+    setInterval(() => this.props.fetchBuses(), API_REQUEST_INTERVAL);
+
+    //resolves map resizing bug; allows responsize map resizing when window changes
+    window.addEventListener('resize', () => {
+      this.setState({
+        viewport: {
+          ...this.state.viewport,
+          width: window.innerWidth,
+          height: window.innerHeight
+          }
+        });
+    });
+  }
+
+  componentWillUnmount() {
+    //remove listener
+    window.removeEventListener('resize', this.resize);
+  }
+
+  //handling panning the viewPort
+  onRegionChangeComplete = (viewport) => {
+    this.setState({ viewport });
+  }
+
+  //helper method for getting map boundary
+  getMapBoundary = () => {
+    //reference the mapGL instance
+    const mapBounds = this.map.getMap().getBounds();
+
+    //declare bounds
+    const bounds = {
+      north: mapBounds._ne.lat,
+      south: mapBounds._sw.lat,
+      west: mapBounds._sw.lng,
+      east: mapBounds._ne.lng,
+    };
+
+    return bounds;
+  }
+
+  //helper method for checking if bus is within map boundary
+  isWithInBounds = bus => {
+    const { north, south, west, east } = this.getMapBoundary();
+    return (
+        bus.Latitude >= south &&
+        bus.Latitude <= north &&
+        bus.Longitude >= west &&
+        bus.Longitude <= east
+    );
+  }
+
+  //render buses...can be further refactored
+  renderBus() {
+    const { latitude, longitude } = this.state.viewport;
+
+    //show loading msg if api call is incomplete
+    if (_.isEmpty(this.props.buses)) {
+      return (
+        <Popup latitude={latitude} longitude={longitude - 0.015 }>
+          <div className="errorMsg" style={{ color: '#0080ff', fontSize: 30 }}>Sorry, no buses yet... Loading...</div>
+        </Popup>
+      );
+    }
+
+    //error handing
+    if (this.props.error) {
+      console.log('the error was', this.props.error);
+      return (
+        <Popup latitude={latitude} longitude={longitude - 0.025 }>
+          <div className="errorMsg" style={{ color: 'red', fontSize: 30 }}>Ops...something went wrong, try refresh the page</div>
+        </Popup>
+      );
+    }
+
+    //could use async instead of doing a prop check
+    if (this.props.buses) {
+
+      //filtering buses not within bounds
+      const filteredBuses = _.filter(this.props.buses, this.isWithInBounds);
+
+      return (
+        _.map(filteredBuses, (bus, index) => {
+          return (
+            <Bus
+              bus={bus}
+              key={index}
+            />
+          );
+        })
+      )
     }
   };
 
-  componentDidUpdate() {
-
-  }
-
-
-  onRegionChangeComplete = (viewport) => {
-    this.setState({ viewport });
-    //TODO: then query translink via redux action creator
-    //TODO: then update markers
-  }
-
   render() {
     return (
-      <div style={{ width: '100vw', height: '100vh' }}>
+      <div className="Map-Container">
         <ReactMapGL
-          //className="Map-Container"
           {...this.state.viewport}
-          onViewportChange={(viewport) => this.setState({viewport})}
-          width={window.innerWidth}
+          onViewportChange={this.onRegionChangeComplete}
           mapboxApiAccessToken={MAPBOX_TOKEN}
-          //reuseMaps={true}
-          containerStyle={{ width: '100%', height: '100%' }}
+          ref={map => {this.map = map}}
+          reuseMaps={true}
           mapStyle='mapbox://styles/mapbox/streets-v10'
         >
-
+          {this.renderBus()}
         </ReactMapGL>
+
       </div>
     );
   }
 }
 
-export default Map;
+function mapStateToProps({ buses }) {
+  return { buses: buses.fetchResults, error: buses.error };
+};
+
+export default connect(mapStateToProps, actions)(Map);
