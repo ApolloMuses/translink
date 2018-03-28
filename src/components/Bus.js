@@ -6,10 +6,17 @@ import FaBus from 'react-icons/lib/fa/bus';
 
 //TODO: convert into class component and add in animations
 
+//for night buses
+const typeCheck = (RouteNo) => {
+  if (RouteNo.startsWith('N')) return RouteNo;
+
+  return _.parseInt(RouteNo).toString();
+}
+
 const Bus = ({ bus }) => (
   <Marker latitude={bus.Latitude} longitude={bus.Longitude}>
 
-    <div className="busNumber" style={styles.titleStyle}>{_.parseInt(bus.RouteNo).toString()}</div>
+    <div className="busNumber" style={styles.titleStyle}>{typeCheck(bus.RouteNo)}</div>
     <FaBus size={10} style={styles.iconStyle} />
 
   </Marker>
