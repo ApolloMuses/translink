@@ -16,7 +16,7 @@ The following tools were used:
 	<img src="https://github.com/ApolloMuses/translink/master/screenshots/ss.png"/>
 </p>
 
-###Try it out
+### Try it out
 
 Clone or download the repository and run:
 ```ruby
@@ -24,7 +24,7 @@ npm install
 ```
 
 
-###caveats
+### caveats
 
 As of current, the Translink Api is an unsecured http call. Thus it will not pass 'Access-Control-Allow-Origin' issues (having unsecured http in https pages). Unfortunately simply changing the http -> https does not work for this case.
 
@@ -34,12 +34,12 @@ To resolve this for production, you can build and host your own server that is h
 
 To see a failed deployment you can visit [here](https://translink-79b18.firebaseapp.com/).
 
-###features
+### features
 
--self updating bus location
--scrolling and zooming capable map
--performant data load and rerendering of new data
+- self updating bus location
+- scrolling and zooming capable map
+- performant data load and rerendering of new data
 
 
-###License
+### License
 MIT
