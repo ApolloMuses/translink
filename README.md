@@ -13,7 +13,7 @@ The following tools were used:
 ### Screenshots
 
 <p align="center">
-	<img src="translink/screenshots/ss.png"/>
+	<img src="./screenshots/ss.png"/>
 </p>
 
 ### Try it out
