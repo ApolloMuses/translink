@@ -13,7 +13,7 @@ The following tools were used:
 ### Screenshots
 
 <p align="center">
-	<img src="https://github.com/ApolloMuses/translink/master/screenshots/ss.png"/>
+	<img src="translink/screenshots/ss.png"/>
 </p>
 
 ### Try it out
