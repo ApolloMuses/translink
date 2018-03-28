@@ -41,5 +41,10 @@ To see a failed deployment you can visit [here](https://translink-79b18.firebase
 - performant data load and rerendering of new data
 
 
+### TODO
+
+- Build https compliant server to handle non-https Translink api requests 
+- Improve performance via allowing server side filtering based on current map boundaries + certain # radius to the above mentioned end point
+
 ### License
 MIT
