@@ -49,7 +49,8 @@ const updateBusHelper = (dispatch, updateTime) => {
 //to trigger the get bus cloud function to keep semi up to date data.
 //TBH, this status function would not be necessary if the web app reaches scale, since
 //every time someone visits the website, the firebase database would be updated (if it is
-//within certain seconds of the update time) so the db would
+//within certain seconds of the update time) and the new data is automatically pushed to every
+//available instance so the db would
 //realistically speaking always have real time data. 
 
 export const getStatus = () => (dispatch) => {
