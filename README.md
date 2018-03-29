@@ -1,4 +1,4 @@
-# Translink
+# Translink with Firebase
 
 The purpose of this project is to produce a near-real-time location reporting of Translink buses mapped on a responsive webapp.
 
@@ -9,12 +9,15 @@ The following tools were used:
 4. [lodash](https://lodash.com/)
 5. [redux](https://redux.js.org/)
 6. [redux-thunk](https://github.com/gaearon/redux-thunk)
+7. [firebase](https://firebase.google.com)
 
 ### What it looks like
 
 <p align="center">
 	<img src="./screenshots/ss.png"/>
 </p>
+
+[Check it out here in production.](https://translink-79b18.firebaseapp.com/)
 
 ### Try it out
 
@@ -26,13 +29,34 @@ npm install
 
 ### Caveats
 
-As of current, the Translink Api is an unsecured http call. Thus it will not pass 'Access-Control-Allow-Origin' issues (having unsecured http in https pages). Unfortunately simply changing the http -> https does not work for this case.
+If you request Translink's api directly from the browser, you will get CORS issues.
+
+Here are some ways to bypass this:
 
 For development purposes you can bypass this by installing the Allow-Control-Allow-Origin Chrome extension [Link](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi).
 
-To resolve this for production, you can build and host your own server that is https compliant that makes the http calls to Translink. Or you can contact Translink.
+To resolve this for production, you can build and host your own server that host the data returned from Translink.
+For this example project, we used firebase cloud functions and database as a word around to resolve this issue.
 
-To see a failed deployment you can visit [here](https://translink-79b18.firebaseapp.com/).
+Here are the steps to add firebase to your react project:
+
+1. Install firebase in your project directory to be able to access db features.
+
+```ruby
+npm install firebase
+```
+
+2. Create a firebase account (google account), and project on the firebase console
+
+3. Go to the created project on firebase console, navigate to the settings section and COPY your API key.
+
+4. PASTE in your firebase API key in the firebase.js folder in the project directory you have cloned.
+
+5. Install the Firebase CLI to work on your cloud functions code (code already provided).
+
+6. Deploy your cloud functions code
+
+
 
 ### Features
 
@@ -43,7 +67,6 @@ To see a failed deployment you can visit [here](https://translink-79b18.firebase
 
 ### TODO
 
-- Build https compliant server to handle non-https Translink api requests 
 - Improve performance via allowing server side filtering based on current map boundaries + certain # radius to the above mentioned end point
 - Animation for individual buses
 
