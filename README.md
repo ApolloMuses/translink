@@ -48,9 +48,9 @@ npm install firebase
 
 2. Create a firebase account (google account), and project on the firebase console
 
-3. Go to the created project on firebase console, navigate to the settings section and COPY your API key.
+3. Go to the created project on firebase console, navigate to the settings section and COPY your API key and your config details.
 
-4. PASTE in your firebase API key in the firebase.js folder in the project directory you have cloned.
+4. PASTE and replace the config details (including api key) in the firebase.js folder in the project directory you have cloned.
 
 5. Install the Firebase CLI to work on your cloud functions code (code already provided).
 
