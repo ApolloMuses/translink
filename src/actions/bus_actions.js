@@ -1,50 +1,59 @@
 import request from 'superagent';
-import _ from 'lodash';
+import moment from 'moment';
+import fire from '../firebase';
 
 import {
   FETCH_BUSES,
-  FETCH_BUS_ERROR,
+  FETCH_STATUS,
+  UPDATE_NEEDED,
 } from './types';
-//returns all active busses
-//http://api.translink.ca/rttiapi/v1/buses?apikey=[APIKey]
 
 
-//Again, the API keys should be excluded
-const BUS_ROOT_URL = 'https://api.translink.ca/rttiapi/v1/buses';
-const APIKEY = 'M7cSDcbs72iJ5mFWFtdX';
+const API_URL = 'https://us-central1-translink-79b18.cloudfunctions.net/getBusData';
 
-//url helper, separated to allow other types of requests
-const API_URL = `${BUS_ROOT_URL}?apikey=${APIKEY}`;
+// Fetch bus results from firebase
+// when busResults updates on firebase,
+// the 'on' listener will update react automatically
+export const getBuses = () => (dispatch) => {
+  const rootRef = fire.database().ref('/translink/busResults/');
 
+  rootRef.on('value', snapshot => {
+    const results = snapshot.val();
 
-//data clean up helper fn
-const filteredResults = (data) => {
-  const results = _.map(data, (value) => {
-    const { VehicleNo, RouteNo, Latitude, Longitude } = value;
-
-    return { VehicleNo, RouteNo, Latitude, Longitude };
+    dispatch({ type: FETCH_BUSES, payload: results });
   });
-
-  return results;
 }
 
-//fetch buses
-export const fetchBuses = () => async (dispatch) => {
-  try {
+//update buses
+const updateBusHelper = (dispatch, updateTime) => {
+  const now = moment().unix();
+  const oldTime = updateTime + 15;
 
-    //request data
-    let response = await request.get(API_URL)
-                                .set({ accept: 'application/json' });
+  if (oldTime < now) {
 
-    //console.log(response);
-    //clean up data
-    const results = filteredResults(response.body);
+    const rootRef = fire.database().ref('/translink/status/');
 
-    //update state
-    dispatch({ type: FETCH_BUSES, payload: results });
-
-  } catch (err) {
-    console.log(err);
-    dispatch({ type: FETCH_BUS_ERROR, error: err });
+    rootRef.update({ updateNeeded: true });
+    dispatch({ type: UPDATE_NEEDED });
   }
+}
+
+//Fetch status along with the bus data
+//since we only need this once at the begining, we only need to call it once
+//it may seem excessive to separate the two, but this way it avoids unecessary
+//updates of the db
+export const getStatus = () => (dispatch) => {
+  const rootRef = fire.database().ref('/translink/status/');
+
+  rootRef.once('value', snapshot => {
+    const results = snapshot.val();
+
+    updateBusHelper(dispatch, results.updateTime);
+
+    dispatch({ type: FETCH_STATUS, payload: results });
+  });
+}
+
+export const updateBuses = (updateTime) => (dispatch) => {
+  updateBusHelper(dispatch, updateTime);
 }

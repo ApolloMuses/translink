@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import ReactMapGL, { Popup } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import _ from 'lodash';
+import moment from 'moment';
+import request from 'superagent';
 
 import Bus from './Bus';
 import * as actions from '../actions';
@@ -10,7 +12,6 @@ import * as actions from '../actions';
 //should use dotenv to separateout the token but for the purpose of this app,
 //but for the purposes of this app, we'll just use a const
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiYXBvbGxvbXVzZXMiLCJhIjoiY2pmOWg2c3VjMjFwaDJ3cGRrcDZyMDVsdyJ9.6ztyqo-fnkW1DNabN1HQWQ';
-const API_REQUEST_INTERVAL = 2500;
 
 
 class Map extends Component {
@@ -26,13 +27,11 @@ class Map extends Component {
 
   componentWillMount() {
     //fetching for the first time
-    this.props.fetchBuses();
+    this.props.getBuses();
+    this.props.getStatus();
   }
 
   componentDidMount() {
-    //fetching new bus locations on a interval
-    setInterval(() => this.props.fetchBuses(), API_REQUEST_INTERVAL);
-
     //resolves map resizing bug; allows responsize map resizing when window changes
     window.addEventListener('resize', () => {
       this.setState({
@@ -43,7 +42,14 @@ class Map extends Component {
           }
         });
     });
+
+    const updateTime = this.props.status.updateTime;
+
+    //fetching new bus locations on a interval
+    const now = moment().unix();
+    setInterval(() => this.props.updateBuses(updateTime ? updateTime : now), 8000);
   }
+
 
   componentWillUnmount() {
     //remove listener
@@ -144,7 +150,7 @@ class Map extends Component {
 }
 
 function mapStateToProps({ buses }) {
-  return { buses: buses.fetchResults, error: buses.error };
+  return { buses: buses.fetchResults, error: buses.error, status: buses.statusResults };
 };
 
 export default connect(mapStateToProps, actions)(Map);

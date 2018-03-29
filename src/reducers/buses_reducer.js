@@ -1,26 +1,25 @@
 
 import {
   FETCH_BUSES,
-  FETCH_BUS_ERROR
+  FETCH_STATUS,
 } from '../actions/types';
 
 const INITIAL_STATE = {
+  fetchStatus: null,
   fetchResults: [],
+  statusResults: [],
   error: null,
 }
 
 export default function(state = INITIAL_STATE, action) {
   console.log(action);
   switch (action.type) {
-    //replace data with each call.
-    //Can be more performant if only added to exisiting list
-    //by using _.uniqBy with the lodash library
 
     case FETCH_BUSES:
-      return { fetchResults: action.payload };
+      return { ...state, fetchResults: action.payload };
 
-    case FETCH_BUS_ERROR:
-      return { error: action.payload };
+    case FETCH_STATUS:
+      return { ...state, statusResults: action.payload };
 
     default:
       return state;
