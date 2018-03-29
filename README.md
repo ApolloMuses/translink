@@ -36,7 +36,7 @@ Here are some ways to bypass this:
 For development purposes you can bypass this by installing the Allow-Control-Allow-Origin Chrome extension [Link](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi).
 
 To resolve this for production, you can build and host your own server that host the data returned from Translink.
-For this example project, we used firebase cloud functions and database as a word around to resolve this issue.
+For this example project,  firebase cloud functions and database were used as a work around to resolve this issue.
 
 Here are the steps to add firebase to your react project:
 
